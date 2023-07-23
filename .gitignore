@@ -72,5 +72,5 @@ Thumbs.db
 *.exe
 
 # CMake
-
-CMakeList.txt.user
+.vscode/settings.json
+CMakeLists.txt.user
