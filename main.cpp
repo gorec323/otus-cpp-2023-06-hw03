@@ -3,7 +3,8 @@
 #include <list>
 #include <map>
 #include <algorithm>
-#include "my_poll_allocator.h"
+#include <my_poll_allocator.h>
+#include <my_vector.h>
 
 using namespace std;
 
@@ -35,11 +36,37 @@ constexpr T factorial(T v) noexcept
     if (v == 1)
         return v;
 
-    return v * factorial(v -1);
+    if (v == 0)
+        return 1;
+
+    return v * factorial(v - 1);
 }
 
 int main()
 {
+    using namespace std;
+
+    constexpr int ITER_COUNT{10};
+    { // создание map с 10 элементами с ключом от 0 до 9 и значением в виде факториала ключа
+        map<int, int> m;
+
+        for (int i = 0; i < ITER_COUNT; ++i)
+        {
+            m.emplace(i, factorial(i));
+        }
+
+        printMapContainerItems(m);
+
+        map<int, int, std::less<int>, MyPollAllocator<int, ITER_COUNT>> mPool;
+
+        for (int i = 0; i < ITER_COUNT; ++i)
+        {
+            mPool.emplace(i, factorial(i));
+        }
+
+        printMapContainerItems(mPool);
+    }
+
     {
         std::vector<int, MyPollAllocator<int>> v1 = {1, 2, 3, 4, 5};
         printContainerItems(v1);
@@ -57,19 +84,33 @@ int main()
         std::list<int, MyPollAllocator<int>> l2 = {4, 3, 1, 2};
         printContainerItems(l2);
         l2 = std::move(l);
-        printContainerItems(l2);        
+        printContainerItems(l2);
     }
 
-    static constexpr std::size_t POOL_COUNT{11};
-    std::map<std::size_t, std::size_t, std::less<std::size_t>, MyPollAllocator<std::pair<const std::size_t, std::size_t>, POOL_COUNT>> m;
-    for (size_t i = 0, f = 1; i < POOL_COUNT; ++i)
-    {
-        f *= (i + 1);
-        m.insert(std::make_pair(i, f));
+    { // самописный контейнер
+        MyVector<int> v;
+        for (size_t i = 0; i < ITER_COUNT; ++i)
+            v.push_back(i);
+
+        printContainerItems(v);
     }
 
-    printMapContainerItems(m);
+    {   // самописный контейнер с самописным аллокатором
+        // 26 - минимальное число с учётом того, что вектор резервируется память порциями (2*size+1)
+        MyVector<int, MyPollAllocator<int, 26>> v;
 
-    // my_vector<int, std::allocator<int>> vec;
+        for (size_t i = 0; i < ITER_COUNT; ++i) {
+            std::cout << "1." << i << " MyVector Myalloc" << std::endl;
+            v.push_back(i);
+        }
+
+        printContainerItems(v);
+
+        auto v2 = std::move(v);
+        printContainerItems(v2);
+        v = v2;
+        printContainerItems(v);
+    }
+
     return 0;
 }

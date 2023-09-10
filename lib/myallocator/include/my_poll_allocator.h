@@ -12,7 +12,7 @@ public:
     using value_type = T;
     using propagate_on_container_copy_assignment = std::true_type;
     using propagate_on_container_move_assignment = std::true_type;
-    using propagate_on_container_swap = std::false_type; // UB if std::false_type and a1 != a2;
+    using propagate_on_container_swap = std::true_type; // UB if std::false_type and a1 != a2;
 
     MyPollAllocator() noexcept = default;
 
@@ -45,7 +45,7 @@ public:
         for (size_t i = 0; (i + size) <= POOL_COUNT; ++i) {
             bool canAllocate{true};
             for (size_t j = size; (canAllocate) && (j > 0); --j) {
-                canAllocate &= !m_allocatedFlags[i];
+                canAllocate &= !m_allocatedFlags[size - j + i];
             }
 
             if (canAllocate) {
