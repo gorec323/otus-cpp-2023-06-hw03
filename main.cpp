@@ -33,6 +33,7 @@ void printMapContainerItems(const C &c) noexcept
 template <typename T>
 constexpr T factorial(T v) noexcept
 {
+    static_assert(std::is_integral<T>::value, "T должен быть целым числом");
     if (v == 1)
         return v;
 
@@ -47,26 +48,62 @@ int main()
     using namespace std;
 
     constexpr int ITER_COUNT{10};
-    { // создание map с 10 элементами с ключом от 0 до 9 и значением в виде факториала ключа
+    {   // создание экземпляра map<int, int>
         map<int, int> m;
 
+        // заполнение 10 элементами, где ключ - это число от 0 до 9, а значение - факториал ключа
         for (int i = 0; i < ITER_COUNT; ++i)
         {
             m.emplace(i, factorial(i));
         }
 
+        // вывод на экран всех значений map
         printMapContainerItems(m);
 
+        // создание экземпляра map<int, int> с новым аллокатором
         map<int, int, std::less<int>, MyPollAllocator<int, ITER_COUNT>> mPool;
 
+        // заполнение 10 элементами, где ключ - это число от 0 до 9, а значение - факториал ключа
         for (int i = 0; i < ITER_COUNT; ++i)
         {
             mPool.emplace(i, factorial(i));
         }
 
+        // вывод на экран всех значений map
         printMapContainerItems(mPool);
     }
 
+    { // создание экземпляра своего контейнера для хранения значений типа int
+        MyVector<int> v;
+
+        // заполнение 10 элементами от 0 до 9
+        for (size_t i = 0; i < ITER_COUNT; ++i)
+            v.push_back(i);
+
+        // вывод на экран всех значений, хранящизся в контейнере
+        printContainerItems(v);
+    }
+
+    {   // создание экземпляра своего контейнера для хранения значений типа int с новым аллокатором, ограниченным 10 элементами
+        MyVector<int, MyPollAllocator<int, 10>> v;
+
+        // заполнение 10 элементами от 0 до 9// заполнение 10 элементами от 0 до 9
+        for (size_t i = 0; i < ITER_COUNT; ++i)
+            v.push_back(i);
+
+        // вывод на экран всех значений, хранящизся в контейнере
+        printContainerItems(v);
+
+        // для себя
+        std::cout << std::endl << std::string(50, '*') << std::endl << "for me" << std::endl;
+
+        auto v2 = std::move(v);
+        printContainerItems(v2);
+        v = v2;
+        printContainerItems(v);
+    }
+
+    // проверка работы контейнера с новым аллокатором и std::initializer_list и move
     {
         std::vector<int, MyPollAllocator<int>> v1 = {1, 2, 3, 4, 5};
         printContainerItems(v1);
@@ -85,31 +122,6 @@ int main()
         printContainerItems(l2);
         l2 = std::move(l);
         printContainerItems(l2);
-    }
-
-    { // самописный контейнер
-        MyVector<int> v;
-        for (size_t i = 0; i < ITER_COUNT; ++i)
-            v.push_back(i);
-
-        printContainerItems(v);
-    }
-
-    {   // самописный контейнер с самописным аллокатором
-        // 26 - минимальное число с учётом того, что вектор резервируется память порциями (2*size+1)
-        MyVector<int, MyPollAllocator<int, 26>> v;
-
-        for (size_t i = 0; i < ITER_COUNT; ++i) {
-            std::cout << "1." << i << " MyVector Myalloc" << std::endl;
-            v.push_back(i);
-        }
-
-        printContainerItems(v);
-
-        auto v2 = std::move(v);
-        printContainerItems(v2);
-        v = v2;
-        printContainerItems(v);
     }
 
     return 0;

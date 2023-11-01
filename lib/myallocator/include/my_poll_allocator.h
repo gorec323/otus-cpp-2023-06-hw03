@@ -4,24 +4,33 @@
 #include <cstdlib>
 #include <memory>
 #include <stdexcept>
+#include <bitset>
 
 template <typename T, std::size_t N = 10>
 class MyPollAllocator
 {
 public:
     using value_type = T;
-    using propagate_on_container_copy_assignment = std::true_type;
+
+//    using propagate_on_container_copy_assignment = std::true_type;
     using propagate_on_container_move_assignment = std::true_type;
     using propagate_on_container_swap = std::true_type; // UB if std::false_type and a1 != a2;
 
     MyPollAllocator() noexcept = default;
+    MyPollAllocator(const MyPollAllocator &) = default;
+    MyPollAllocator(MyPollAllocator &&other) noexcept = default;
 
     template <class U>
-    MyPollAllocator(const MyPollAllocator<U, N> &a) noexcept :
-        m_pool {a.m_pool}
+    MyPollAllocator(const MyPollAllocator<U, N> &a) noexcept
     {
-        std::copy(std::begin(a.m_allocatedFlags), std::end(a.m_allocatedFlags), std::begin(m_allocatedFlags));
     }
+
+    MyPollAllocator &operator=(const MyPollAllocator &)
+    {
+        return *this;
+    }
+
+    MyPollAllocator &operator=(MyPollAllocator &&other) noexcept = default;
 
     ~MyPollAllocator() = default;
 
@@ -30,48 +39,37 @@ public:
         if (size == 0)
             return nullptr;
 
-        if (size > POOL_COUNT)
-            throw std::bad_alloc();
-
-        if (!m_pool) {
-            m_pool.reset(::operator new(POOL_COUNT * sizeof(T)),
-                         [](void *p)
-                         {
-                            ::operator delete(p, POOL_COUNT * sizeof(T));
-                         });
-            std::fill_n(std::begin(m_allocatedFlags), POOL_COUNT, false);
-        }
-
-        for (size_t i = 0; (i + size) <= POOL_COUNT; ++i) {
-            bool canAllocate{true};
-            for (size_t j = size; (canAllocate) && (j > 0); --j) {
-                canAllocate &= !m_allocatedFlags[size - j + i];
+        std::size_t startPosition;
+        if (can_allocate(size, startPosition)) {
+            if (!m_pool) {
+                m_pool.reset(new T[N]);
             }
+            for (size_t j {startPosition}; j < (startPosition + size); ++j)
+                m_allocatedFlags.set(j);
 
-            if (canAllocate) {
-                std::fill_n(std::begin(m_allocatedFlags) + i, size, true);
-                return static_cast<T *>(m_pool.get()) + i;
-            }
+            return m_pool.get() + startPosition;
+        } else {
+//            if (size > N)
+//                throw std::bad_alloc();
+            return new T[size];
         }
-
-        throw std::bad_alloc();
     }
 
     void deallocate(T *p, std::size_t n) noexcept
     {
-        if (p < m_pool.get())
-            return;
-        // throw std::out_of_range("p < start pool address");
+        if (pointer_in_buffer(p, n)) {
 
-        std::size_t diffSize = (p - static_cast<T *>(m_pool.get()));
-        if (diffSize >= POOL_COUNT)
-            return;
-        // throw std::out_of_range("p + n >= start pool address + POOL_COUNT");
+            std::size_t diffSize = (p - m_pool.get());
+            if (diffSize >= N)
+                return;
 
-        while (n > 0) {
-            m_allocatedFlags[diffSize] = false;
-            ++diffSize;
-            --n;
+            while (n > 0) {
+                m_allocatedFlags[diffSize] = false;
+                ++diffSize;
+                --n;
+            }
+        } else {
+            delete[] p;
         }
     }
 
@@ -87,11 +85,37 @@ public:
         return this->m_pool == other.m_pool;
     }
 
-    std::shared_ptr<void> m_pool = nullptr;
-    bool m_allocatedFlags[N];
+    constexpr bool operator==(const MyPollAllocator &other) const noexcept
+    {
+        return true;
+    }
 
 private:
-    static constexpr std::size_t POOL_COUNT{N};
+    using storage_type = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+
+    bool pointer_in_buffer(const T *p, std::size_t size) const noexcept
+    {
+        return ((m_pool.get() <= p) && ((p + size) <= (m_pool.get() + N)));
+    }
+
+    bool can_allocate(std::size_t size, std::size_t &startIndex) const noexcept
+    {
+        for (size_t i = 0; (i + size) <= N; ++i) {
+            bool canAllocate {true};
+            for (size_t j = size; (canAllocate) && (j > 0); --j) {
+                canAllocate &= !m_allocatedFlags[size - j + i];
+            }
+
+            if (canAllocate) {
+                startIndex = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    std::shared_ptr<T[]> m_pool;
+    std::bitset<N> m_allocatedFlags;
 };
 
 template <class T, class U>

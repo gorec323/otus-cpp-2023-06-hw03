@@ -48,11 +48,11 @@ public:
     {
         if (m_size == m_capacity) {
             m_capacity = m_capacity * 2 + 1;
-            auto newData = m_allocator.allocate(m_capacity);
+            auto newData = std::allocator_traits<allocator_type>::allocate(m_allocator, m_capacity);
             if (m_size > 0) {
                 std::memcpy(newData, m_data, m_size * sizeof(value_type));
             }
-            m_allocator.deallocate(m_data, m_size);
+            std::allocator_traits<allocator_type>::deallocate(m_allocator, m_data, m_size);
             m_data = newData;
             
         }
