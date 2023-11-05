@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <my_poll_allocator.h>
 #include <my_vector.h>
+#include "version.h"
 
 using namespace std;
 
@@ -47,6 +48,8 @@ int main()
 {
     using namespace std;
 
+    cout << "My allocators app version: " << PROJECT_VERSION << endl;
+
     constexpr int ITER_COUNT{10};
     {   // создание экземпляра map<int, int>
         map<int, int> m;
@@ -61,7 +64,7 @@ int main()
         printMapContainerItems(m);
 
         // создание экземпляра map<int, int> с новым аллокатором
-        map<int, int, std::less<int>, MyPollAllocator<int, ITER_COUNT>> mPool;
+        map<int, int, std::less<int>, MyPollAllocator<pair<const int, int>, ITER_COUNT>> mPool;
 
         // заполнение 10 элементами, где ключ - это число от 0 до 9, а значение - факториал ключа
         for (int i = 0; i < ITER_COUNT; ++i)

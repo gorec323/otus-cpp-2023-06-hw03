@@ -27,7 +27,7 @@ TEST(MyAllocatorTest, Ctor)
 
 
         // создание экземпляра map<int, int> с новым аллокатором
-        map<int, int, std::less<int>, MyPollAllocator<int, ITER_COUNT>> mPool;
+        map<int, int, std::less<int>, MyPollAllocator<pair<const int, int>, ITER_COUNT>> mPool;
 
         // заполнение 10 элементами, где ключ - это число от 0 до 9, а значение - факториал ключа
         const auto initial = memuse();

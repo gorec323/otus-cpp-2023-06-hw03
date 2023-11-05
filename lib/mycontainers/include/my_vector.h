@@ -21,9 +21,6 @@ public:
     using iterator = pointer;
     using const_iterator = const_pointer;
 
-    // MyVector() = default;
-    // ~MyVector() = default;
-
     iterator begin() const noexcept
     {
         return m_data;
