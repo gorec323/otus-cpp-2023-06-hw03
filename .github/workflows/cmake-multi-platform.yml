@@ -95,16 +95,17 @@ jobs:
     needs: build
 
     steps:
-    # - name: Download artifacts
-    #   uses: actions/download-artifact@v3
-    #   with:
-    #     path: release-with-dirs
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: ${{github.workspace}}/build
 
-    # - name: Fixup artifacts
-    #   run: |
-    #     ls -la release-with-dirs/
-    #     # mv release-with-dirs/*/* release/
-    #     # rm release/ccache*
+    - name: Fixup artifacts
+      run: |
+        ls -la 
+        ls -la build
+        # mv release-with-dirs/*/* release/
+        # rm release/ccache*
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
