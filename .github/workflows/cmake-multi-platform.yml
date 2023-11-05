@@ -102,9 +102,9 @@ jobs:
 
     - name: Fixup artifacts
       run: |
-        ls -la
-        mv release-with-dirs/*/* release/
-        rm release/ccache*
+        ls -la release-with-dirs/
+        # mv release-with-dirs/*/* release/
+        # rm release/ccache*
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
