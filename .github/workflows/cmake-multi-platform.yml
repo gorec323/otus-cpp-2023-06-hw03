@@ -83,8 +83,8 @@ jobs:
       if: ${{ matrix.c_compiler }} == gcc
       uses: actions/upload-artifact@v3
       with:
-        path: ${{github.workspace}}/build/custom_allocators-0.0.${{ github.run_number }}-linux.deb
-        name: custom_allocators-0.0.${{ github.run_number }}-linux.deb
+        path: ${{github.workspace}}/build/custom_allocators-0.0.${{ github.run_number }}-Linux.deb
+        name: custom_allocators-0.0.${{ github.run_number }}-Linux.deb
 
 
   release:
