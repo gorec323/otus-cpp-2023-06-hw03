@@ -6,12 +6,11 @@ if (BUILD_TESTING)
     add_subdirectory(test)
 endif()
 
-add_library(${PROJECT_NAME} 
+add_library(${PROJECT_NAME} INTERFACE
     include/my_poll_allocator.h
-    src/my_poll_allocator.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
-PUBLIC
+INTERFACE
     include
 )

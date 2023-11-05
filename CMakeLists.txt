@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 set(PATCH_VERSION 1 CACHE INTERNAL "Patch version. Default = 1")
 set(PROJECT_VERSION 0.0.${PATCH_VERSION} CACHE INTERNAL "Application version" FORCE)
 
-project(my_allocators VERSION ${PROJECT_VERSION} LANGUAGES CXX)
+project(custom_allocators VERSION ${PROJECT_VERSION} LANGUAGES CXX)
 
 configure_file(
     version.h.in
