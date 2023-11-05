@@ -80,11 +80,11 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{ matrix.build_type }} --target package
 
     - name: Upload Debian package
-      if: runner.os == 'Linux'
+      if: ${{ matrix.c_compiler }} == gcc
       uses: actions/upload-artifact@v3
       with:
-        path: ${{github.workspace}}/build/custom_allocators-0.0.${{ github.run_number }}-${{ matrix.c_compiler }}-linux.deb
-        name: custom_allocators-0.0.${{ github.run_number }}-${{ matrix.c_compiler }}-linux.deb
+        path: ${{github.workspace}}/build/custom_allocators-0.0.${{ github.run_number }}-linux.deb
+        name: custom_allocators-0.0.${{ github.run_number }}-linux.deb
 
 
   release:
