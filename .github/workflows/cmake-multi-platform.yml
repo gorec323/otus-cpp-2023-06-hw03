@@ -100,12 +100,12 @@ jobs:
       with:
         path: ${{github.workspace}}/build
 
-    - name: Fixup artifacts
-      run: |
-        ls -la 
-        ls -la build
-        # mv release-with-dirs/*/* release/
-        # rm release/ccache*
+    # - name: Fixup artifacts
+    #   run: |
+    #     ls -la 
+    #     ls -la build
+    #     # mv release-with-dirs/*/* release/
+    #     # rm release/ccache*
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
