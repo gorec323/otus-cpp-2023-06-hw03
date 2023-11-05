@@ -114,7 +114,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ needs.build.outputs.tag }}
-        body_path: release/changelog.md
+        # body_path: release/changelog.md
         files: ${{github.workspace}}/build/custom_allocators-0.0.${{ github.run_number }}-Linux.deb
         draft: false
         prerelease: false
