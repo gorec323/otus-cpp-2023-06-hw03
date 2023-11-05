@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    outputs:
+        tag: ${{ steps.git.outputs.tag }}
 
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
@@ -93,20 +95,30 @@ jobs:
     needs: build
 
     steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: v${{ github.run_number }}
-          release_name: v${{ github.run_number }}
-          body: |
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: release-with-dirs
+
+    - name: Fixup artifacts
+      run: |
+        ls -la
+        mv release-with-dirs/*/* release/
+        rm release/ccache*
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: v${{ github.run_number }}
+        body: |
             Changes in this Release
             - First Change
             - Second Change
-          draft: false
-          prerelease: false
+        draft: false
+        prerelease: false
 
  #   - name: Upload Release Asset
  #     id: upload-release-asset
