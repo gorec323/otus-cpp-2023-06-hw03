@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.6)
 
 project(my_allocator_test LANGUAGES CXX)
 
@@ -6,7 +6,7 @@ include(CTest)
 
 enable_testing()
 
-find_package(GTest)
+find_package(GTest REQUIRED)
 
 add_executable(${PROJECT_NAME}
     memuse.h
