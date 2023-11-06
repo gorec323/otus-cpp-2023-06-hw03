@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.6)
 
 set(PATCH_VERSION 1 CACHE INTERNAL "Patch version. Default = 1")
 set(PROJECT_VERSION 0.0.${PATCH_VERSION} CACHE INTERNAL "Application version" FORCE)
