@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     outputs:
-        tag: ${{ steps.git.outputs.tag }}
+        tag: 0.0.${{ github.run_number }}
 
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
@@ -113,7 +113,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ needs.build.outputs.tag }}
+        tag_name: v0.0.${{ github.run_number }}
         # body_path: release/changelog.md
         files: ${{github.workspace}}/build/custom_allocators-0.0.${{ github.run_number }}-Linux.deb
         draft: false
