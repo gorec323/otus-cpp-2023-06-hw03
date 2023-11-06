@@ -57,6 +57,16 @@ public:
         ++m_size;
     }
 
+    size_type capacity() const noexcept
+    {
+        return m_capacity;
+    }
+
+    size_type size() const noexcept
+    {
+        return m_size;
+    }
+
 private:
     allocator_type m_allocator;
     size_type m_size {0};
