@@ -115,7 +115,7 @@ jobs:
       with:
         tag_name: v0.0.${{ github.run_number }}
         # body_path: release/changelog.md
-        files: ${{github.workspace}}/build/custom_allocators-0.0.${{ github.run_number }}-Linux.deb
+        files: custom_allocators-0.0.${{ github.run_number }}-Linux.deb
         draft: false
         prerelease: false
     # - name: Create Release
