@@ -115,7 +115,7 @@ jobs:
       with:
         tag_name: v0.0.${{ github.run_number }}
         # body_path: release/changelog.md
-        files: build/*.deb
+        files: build/*.deb/*.deb
         draft: false
         prerelease: false
     # - name: Create Release
