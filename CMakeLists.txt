@@ -17,6 +17,11 @@ endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if (BUILD_TESTING)
+    include(CTest)
+    enable_testing()
+endif()
+
 add_subdirectory(lib)
 
 add_executable(${PROJECT_NAME}

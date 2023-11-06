@@ -23,3 +23,5 @@ PRIVATE
     ${GTEST_BOTH_LIBRARIES}
     my_allocator
 )
+
+add_test(${PROJECT_NAME} ${PROJECT_NAME})
